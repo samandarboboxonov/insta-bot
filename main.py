@@ -1,4 +1,5 @@
-import os
+import os 
+from downloader import download_video
 import logging
 from telegram import Update
 from telegram.ext import (
@@ -33,6 +34,21 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
 async def handle_link(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    url = update.message.text
+
+    msg = await update.message.reply_text("⏳ Video yuklanmoqda...")
+
+    try:
+        video = download_video(url)
+
+        await update.message.reply_video(video=open(video, "rb"))
+
+        os.remove(video)
+
+        await msg.edit_text("✅ Tayyor!")
+
+    except Exception as e:
+        await msg.edit_text(f"❌ Xatolik:\n{e}")
     await update.message.reply_text(
         "⏳ Havola qabul qilindi.\nVideo yuklanmoqda..."
     )
